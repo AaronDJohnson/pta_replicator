@@ -105,7 +105,7 @@ class SimulatedPulsar:
 
         print('Pulsar {0} has {1} TOAs observed with {2} systems...'.format(self.name, len(self.toas), len(flags)))
 
-        secperday = 3600*24
+        secperhr = 3600
         toas2 = None
         res2 = np.array([])
         
@@ -123,7 +123,7 @@ class SimulatedPulsar:
             ecorr = np.dot(U*ecorrvec, np.ones(U.shape[1]))
 
             avetoas, aveerr, averes = compute_daily_ave(mytoas.get_mjds().to(u.s).value,
-                                                    myresiduals, err, ecorr=ecorr, dt=secperday)
+                                                    myresiduals, err, ecorr=ecorr, dt=2*secperhr)
 
             if toas2 is None:
                 toas2 = toa.get_TOAs_array(avetoas/secperday, obs=mytoas['obs'][0], flags={'f': flags[0]},
@@ -162,8 +162,8 @@ class SimulatedPulsar:
                 self.model.remove_component(name)
 
         # remove DMX and troposphere delay
-        if 'DispersionDMX' in component_names:
-            self.model.remove_component('DispersionDMX')
+#        if 'DispersionDMX' in component_names:
+#            self.model.remove_component('DispersionDMX')
         if 'TroposphereDelay' in component_names:
             self.model.remove_component('TroposphereDelay')
         if 'FD' in component_names:
