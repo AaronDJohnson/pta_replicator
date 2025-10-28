@@ -106,6 +106,7 @@ class SimulatedPulsar:
         print('Pulsar {0} has {1} TOAs observed with {2} systems...'.format(self.name, len(self.toas), len(flags)))
 
         secperhr = 3600
+        secperday = secperhr*24
         toas2 = None
         res2 = np.array([])
         
