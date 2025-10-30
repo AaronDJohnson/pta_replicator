@@ -127,11 +127,13 @@ class SimulatedPulsar:
                                                     myresiduals, err, ecorr=ecorr, dt=2*secperhr)
 
             if toas2 is None:
-                toas2 = toa.get_TOAs_array(avetoas/secperday, obs=mytoas['obs'][0], flags={'f': flags[0]},
-                                   errors=aveerr*1e6, planets=True, ephem='DE440')
+                toas2 = toa.get_TOAs_array(avetoas/secperday, obs=mytoas['obs'][0],
+                                           flags={'f': flags[0]}, freqs=np.median(mytoas['freq']),
+                                           errors=aveerr*1e6, planets=True, ephem='DE440')
             else:
-                toas2.merge(toa.get_TOAs_array(avetoas/secperday, obs=mytoas['obs'][0], flags={'f': f},
-                                       errors=aveerr*1e6, planets=True, ephem='DE440'))
+                toas2.merge(toa.get_TOAs_array(avetoas/secperday, obs=mytoas['obs'][0],
+                                               flags={'f': f}, freqs=np.median(mytoas['freq']),
+                                               errors=aveerr*1e6, planets=True, ephem='DE440'))
             res2 = np.append(res2, averes)
 
         self.toas = toas2
