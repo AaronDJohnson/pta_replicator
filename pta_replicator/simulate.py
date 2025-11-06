@@ -42,17 +42,28 @@ class SimulatedPulsar:
         """Method to take the current TOAs and model and update the residuals with them"""
         self.residuals = Residuals(self.toas, self.model)
 
-    def fit(self, fitter='auto', **fitter_kwargs):
+    def fit(self, freeze_components=None, fitter='auto', **fitter_kwargs):
         """
         Refit the timing model and update everything
 
         Parameters
         ----------
+        freeze_components
+            List of timing model components to freeze before doing the fit
         fitter : str
             Type of fitter to use [auto]
         fitter_kwargs :
             Kwargs to pass onto fit_toas. Can be useful to set parameters such as max_chi2_increase, min_lambda, etc.
         """
+        if freeze_components is not None:
+            unfreeze_me = []   # keep a list of parameters that are frozen
+            for c in freeze_components:
+                for p in self.model.components[c].params:
+                    par = getattr(self.model, p)
+                    if par.frozen is False:
+                        par.frozen = True
+                        unfreeze_me.append(p)
+
         if fitter == 'wls':
             self.f = pint.fitter.WLSFitter(self.toas, self.model)
         elif fitter == 'gls':
@@ -68,6 +79,12 @@ class SimulatedPulsar:
         self.f.fit_toas(**fitter_kwargs)
         self.model = self.f.model
         self.update_residuals()
+
+        # now unfreeze all of the parameters that were frozen before doing the fit
+        for p in unfreeze_me:
+            par = getattr(self.model, p)
+            if par.frozen:
+                par.frozen = False
 
     def write_partim(self, outpar: str, outtim: str, tempo2: bool = False):
         """Format for either PINT or Tempo2"""
